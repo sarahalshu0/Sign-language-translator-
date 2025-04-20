@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ترجمة لغة الإشارة العربية</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="main.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مترجم لغة الإشارة العربية</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>ترجمة لغة الإشارة العربية</h1>
-  <input type="file" id="image-upload" />
-  <button onclick="predict()">تنبؤ</button>
-  <div id="prediction"></div>
+    <div class="container">
+        <h1>مترجم لغة الإشارة العربية</h1>
+        <video id="videoInput" width="640" height="480" autoplay></video>
+        <br>
+        <button id="startBtn">ابدأ الترجمة</button>
+        <br>
+        <p id="translationText">ترجمة: </p>
+        <button id="speechBtn">تشغيل الصوت</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
