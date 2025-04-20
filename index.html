@@ -1,15 +1,84 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Language Translator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            text-align: center;
+            padding: 50px;
+            direction: ltr;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #007acc;
+        }
+        label, select, button {
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+        .output {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+    </style>
+    <script>
+        function changeLanguage(lang) {
+            const elements = document.querySelectorAll("[data-en], [data-ar]");
+            elements.forEach(el => {
+                el.innerText = lang === 'ar' ? el.dataset.ar : el.dataset.en;
+            });
+            document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
+        }
+    </script>
 </head>
 <body>
-    <h1>Welcome to Sign Language Translator</h1>
-    <p>This website will translate sign language into text and voice.</p>
+    <div class="container">
+        <h1 data-en="Sign Language Translator" data-ar="مترجم لغة الإشارة">Sign Language Translator</h1>
+
+        <label for="languageSelect" data-en="Choose Language:" data-ar="اختر اللغة:">Choose Language:</label>
+        <select id="languageSelect" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+        </select>
+
+        <label for="videoUpload" data-en="Upload Sign Language Video:" data-ar="ارفع فيديو بلغة الإشارة:">Upload Sign Language Video:</label>
+        <input type="file" id="videoUpload" accept="video/*">
+
+        <button onclick="translateVideo()" data-en="Translate" data-ar="ترجمة">Translate</button>
+
+        <div class="output" id="outputText" data-en="Translation will appear here..." data-ar="ستظهر الترجمة هنا...">Translation will appear here...</div>
+        <audio id="outputVoice" controls style="display: none;"></audio>
+    </div>
+
+    <script>
+        function translateVideo() {
+            const output = document.getElementById("outputText");
+            const audio = document.getElementById("outputVoice");
+            output.innerText = "Translating... / جاري الترجمة...";
+            audio.style.display = "none";
+
+            setTimeout(() => {
+                const language = document.getElementById("languageSelect").value;
+                const translation = language === "ar" ? "مرحبًا! هذه ترجمة إشارة." : "Hello! This is a sign translation.";
+                output.innerText = translation;
+
+                // Simulate voice generation
+                const utterance = new SpeechSynthesisUtterance(translation);
+                utterance.lang = language === "ar" ? "ar-SA" : "en-US";
+                speechSynthesis.speak(utterance);
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
-
-
-Add index.html file
