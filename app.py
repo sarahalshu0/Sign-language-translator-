@@ -1,50 +1,69 @@
-from flask import Flask, render_template, request, jsonify
-import cv2
-import mediapipe as mp
+فهمت! تريد **نسخة مبسطة من السيرڤر بدون استخدام الذكاء الاصطناعي**، فقط لإنشاء هيكل أساسي لرفع الفيديو وعرض نتائج وهمية. إليك الكود:
+
+### 📜 ملف `app.py` (بدون AI - للتدريب فقط)
+```python
+from flask import Flask, request, jsonify, render_template_string
 import os
 
 app = Flask(__name__)
 
-# تهيئة MediaPipe لتحليل اليدين
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands()
+# واجهة HTML مع JS مدمج
+HTML = """
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نموذج تجريبي</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #result { margin-top: 20px; padding: 15px; background: #f8f9fa; display: none; }
+    </style>
+</head>
+<body>
+    <h1>نموذج لرفع الفيديو (بدون تحليل)</h1>
+    <input type="file" id="videoInput" accept="video/*">
+    <button onclick="uploadVideo()">رفع الفيديو</button>
+    <div id="result">
+        <p id="demoText">هذا نص تجريبي للعرض فقط!</p>
+    </div>
+
+    <script>
+        function uploadVideo() {
+            const file = document.getElementById('videoInput').files[0];
+            if (!file) return alert("اختر فيديو أولاً");
+            
+            // محاكاة إرسال الفيديو للسيرڤر (بدون تحليل حقيقي)
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+"""
 
 @app.route('/')
 def home():
-    return render_template('index.html')
-
-@app.route('/analyze', methods=['POST'])
-def analyze():
-    if 'video' not in request.files:
-        return jsonify({"error": "لم يتم رفع فيديو"}), 400
-    
-    video = request.files['video']
-    video_path = "temp_video.mp4"
-    video.save(video_path)
-    
-    # تحليل الفيديو
-    detected_text = analyze_video(video_path)
-    os.remove(video_path)  # حذف الفيديو بعد التحليل
-    
-    return jsonify({"text": detected_text})
-
-def analyze_video(video_path):
-    cap = cv2.VideoCapture(video_path)
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        
-        # تحليل إحداثيات اليدين
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = hands.process(frame_rgb)
-        
-        if results.multi_hand_landmarks:
-            # هنا يمكنك إضافة منطق الترجمة الفعلي
-            return "مرحبًا"  # نص تجريبي
-        
-    cap.release()
-    return "لم يتم التعرف على الإشارة"
+    return render_template_string(HTML)
 
 if __name__ == '__main__':
     app.run(debug=True)
+```
+
+### كيفية التشغيل:
+1. احفظ الكود في ملف `app.py`.
+2. افتح الترمينال في نفس المجلد.
+3. اكتب:
+   ```bash
+   python app.py
+   ```
+4. افتح المتصفح على:
+   ```
+   http://localhost:5000
+   ```
+
+### ماذا يفعل هذا الكود؟
+- يعرض واجهة بسيطة لرفع الفيديو.
+- **لا يحلل الفيديو** (يظهر نصًا ثابتًا فقط).
+- مثالي لفهم هيكل السيرڤر قبل إضافة الذكاء الاصطناعي.
+
+إذا كنت تريد إضافة مميزات محددة أخبرني! 😊
