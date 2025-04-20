@@ -1,82 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language Translator</title>
+    <title>مترجم لغة الإشارة</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #e0f7fa;
+            background-color: #f0f8ff; /* اللون الأزرق الفاتح */
+            color: #333;
             text-align: center;
-            padding: 50px;
-            direction: ltr;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #007acc;
-        }
-        label, select, button {
-            margin-top: 20px;
-            display: block;
-            width: 100%;
-        }
-        .output {
-            margin-top: 30px;
             padding: 20px;
-            border: 1px solid #ccc;
-            background-color: #fff;
+        }
+        #translatedText {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #playButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            cursor: pointer;
+        }
+        #playButton:hover {
+            background-color: #0056b3;
         }
     </style>
-    <script>
-        function changeLanguage(lang) {
-            const elements = document.querySelectorAll("[data-en], [data-ar]");
-            elements.forEach(el => {
-                el.innerText = lang === 'ar' ? el.dataset.ar : el.dataset.en;
-            });
-            document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
-        }
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h1 data-en="Sign Language Translator" data-ar="مترجم لغة الإشارة">Sign Language Translator</h1>
+    <h1>مترجم لغة الإشارة</h1>
+    <p>رفع فيديو وتحويله إلى نص وصوت</p>
 
-        <label for="languageSelect" data-en="Choose Language:" data-ar="اختر اللغة:">Choose Language:</label>
-        <select id="languageSelect" onchange="changeLanguage(this.value)">
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-        </select>
-
-        <label for="videoUpload" data-en="Upload Sign Language Video:" data-ar="ارفع فيديو بلغة الإشارة:">Upload Sign Language Video:</label>
-        <input type="file" id="videoUpload" accept="video/*">
-
-        <button onclick="translateVideo()" data-en="Translate" data-ar="ترجمة">Translate</button>
-
-        <div class="output" id="outputText" data-en="Translation will appear here..." data-ar="ستظهر الترجمة هنا...">Translation will appear here...</div>
-        <audio id="outputVoice" controls style="display: none;"></audio>
-    </div>
+    <!-- رفع الفيديو -->
+    <input type="file" id="videoInput" accept="video/*">
+    
+    <!-- عرض النص المترجم -->
+    <div id="translatedText"></div>
+    
+    <!-- زر لتشغيل الصوت -->
+    <button id="playButton" onclick="speakText()">تشغيل الصوت</button>
 
     <script>
-        function translateVideo() {
-            const output = document.getElementById("outputText");
-            const audio = document.getElementById("outputVoice");
-            output.innerText = "Translating... / جاري الترجمة...";
-            audio.style.display = "none";
+        // الكود لتحليل الفيديو والنص الصوتي
 
-            setTimeout(() => {
-                const language = document.getElementById("languageSelect").value;
-                const translation = language === "ar" ? "مرحبًا! هذه ترجمة إشارة." : "Hello! This is a sign translation.";
-                output.innerText = translation;
+        // عندما يقوم المستخدم برفع الفيديو
+        document.getElementById("videoInput").addEventListener("change", function(event) {
+            let videoFile = event.target.files[0];
 
-                // Simulate voice generation
-                const utterance = new SpeechSynthesisUtterance(translation);
-                utterance.lang = language === "ar" ? "ar-SA" : "en-US";
-                speechSynthesis.speak(utterance);
-            }, 2000);
+            // إرسال الفيديو إلى الخادم
+            let formData = new FormData();
+            formData.append("video", videoFile);
+
+            fetch("/api/translateSignLanguage", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                let translatedText = data.translatedText;
+                // عرض الترجمة
+                document.getElementById('translatedText').innerText = translatedText;
+                // تشغيل الصوت
+                speakText(translatedText);
+            })
+            .catch(error => console.error("Error:", error));
+        });
+
+        // دالة لتشغيل الصوت
+        function speakText(text) {
+            var speech = new SpeechSynthesisUtterance();
+            speech.lang = 'ar-SA';
+            speech.text = text;
+            window.speechSynthesis.speak(speech);
         }
     </script>
 </body>
