@@ -1,113 +1,16 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مترجم لغة الإشارة العربية</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ترجمة لغة الإشارة العربية</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="main.js"></script>
 </head>
 <body>
-  <h1>مترجم لغة الإشارة العربية</h1>
-  <video id="video" autoplay playsinline></video>
-  <canvas id="canvas"></canvas>
-  <div id="output">
-    <p id="translatedText">...</p>
-    <button onclick="speakText()">🔊 نطق</button>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
-  <script src="script.js"></script>
+  <h1>ترجمة لغة الإشارة العربية</h1>
+  <input type="file" id="image-upload" />
+  <button onclick="predict()">تنبؤ</button>
+  <div id="prediction"></div>
 </body>
 </html>
-
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  direction: rtl;
-  background-color: #f0f0f0;
-}
-
-video, canvas {
-  width: 640px;
-  height: 480px;
-  border: 1px solid #ccc;
-  margin: 10px auto;
-  display: block;
-}
-
-#output {
-  margin-top: 20px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-}
-
-const videoElement = document.getElementById('video');
-const canvasElement = document.getElementById('canvas');
-const canvasCtx = canvasElement.getContext('2d');
-const translatedTextElement = document.getElementById('translatedText');
-
-// قاعدة بيانات بسيطة لإشارات الحروف (مثال توضيحي)
-const gestures = {
-  'أ': [/* بيانات النقاط المرجعية للحرف أ */],
-  'ب': [/* بيانات النقاط المرجعية للحرف ب */],
-  // أضف بقية الحروف هنا
-};
-
-// دالة لمقارنة النقاط الحالية مع قاعدة البيانات
-function recognizeGesture(landmarks) {
-  // هنا تضعين منطق المقارنة بين landmarks وقاعدة البيانات
-  // وتعيدين الحرف المطابق
-  // هذا مثال توضيحي ويحتاج إلى تطوير
-  return 'أ'; // مثال: التعرف على الحرف أ
-}
-
-function speakText() {
-  const text = translatedTextElement.innerText;
-  if (text && text !== '...') {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ar-SA';
-    window.speechSynthesis.speak(utterance);
-  }
-}
-
-const hands = new Hands({
-  locateFile: (file) => {
-    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-  }
-});
-
-hands.setOptions({
-  maxNumHands: 1,
-  modelComplexity: 1,
-  minDetectionConfidence: 0.7,
-  minTrackingConfidence: 0.7
-});
-
-hands.onResults((results) => {
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-    for (const landmarks of results.multiHandLandmarks) {
-      drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
-      drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', lineWidth: 1 });
-      const recognizedChar = recognizeGesture(landmarks);
-      translatedTextElement.innerText = recognizedChar;
-    }
-  }
-  canvasCtx.restore();
-});
-
-const camera = new Camera(videoElement, {
-  onFrame: async () => {
-    await hands.send({ image: videoElement });
-  },
-  width: 640,
-  height: 480
-});
-camera.start();
