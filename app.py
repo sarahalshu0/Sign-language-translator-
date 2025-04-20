@@ -1,37 +1,50 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import cv2
 import mediapipe as mp
-import numpy as np
+import os
 
 app = Flask(__name__)
 
-# تهيئة MediaPipe
+# تهيئة MediaPipe لتحليل اليدين
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands()
 
-@app.route('/upload', methods=['POST'])
-def upload_video():
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/analyze', methods=['POST'])
+def analyze():
     if 'video' not in request.files:
-        return jsonify({"error": "No video uploaded"}), 400
+        return jsonify({"error": "لم يتم رفع فيديو"}), 400
     
     video = request.files['video']
-    video.save('temp.mp4')
+    video_path = "temp_video.mp4"
+    video.save(video_path)
     
-    # تحليل الفيديو باستخدام MediaPipe (مثال مبسط)
-    cap = cv2.VideoCapture('temp.mp4')
+    # تحليل الفيديو
+    detected_text = analyze_video(video_path)
+    os.remove(video_path)  # حذف الفيديو بعد التحليل
+    
+    return jsonify({"text": detected_text})
+
+def analyze_video(video_path):
+    cap = cv2.VideoCapture(video_path)
     while cap.isOpened():
-        success, frame = cap.read()
-        if not success:
+        ret, frame = cap.read()
+        if not ret:
             break
         
         # تحليل إحداثيات اليدين
-        results = hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = hands.process(frame_rgb)
+        
         if results.multi_hand_landmarks:
-            # هنا تضيفون منطقكم لتحويل الإحداثيات إلى نص (مثال: حركة "مرحبًا")
-            text = "مرحبًا"  # هذا نص وهمي - تحتاجون نموذجًا مدربًا للغة الإشارة العربية
-    
+            # هنا يمكنك إضافة منطق الترجمة الفعلي
+            return "مرحبًا"  # نص تجريبي
+        
     cap.release()
-    return jsonify({"text": text})
+    return "لم يتم التعرف على الإشارة"
 
 if __name__ == '__main__':
     app.run(debug=True)
