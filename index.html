@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مترجم لغة الإشارة العربية</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ترجمة لغة الإشارة</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>مترجم لغة الإشارة العربية</h1>
-        <video id="videoInput" width="640" height="480" autoplay></video>
-        <br>
-        <button id="startBtn">ابدأ الترجمة</button>
-        <br>
-        <p id="translationText">ترجمة: </p>
-        <button id="speechBtn">تشغيل الصوت</button>
+        <h1>تحويل لغة الإشارة إلى نص</h1>
+        
+        <input type="file" id="videoInput" accept="video/*">
+        <button id="uploadBtn">تحليل الفيديو</button>
+        
+        <div id="results" style="display: none;">
+            <h3>النص المترجم:</h3>
+            <p id="outputText"></p>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
