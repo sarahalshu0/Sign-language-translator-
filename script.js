@@ -1,20 +1,20 @@
-document.getElementById('uploadBtn').addEventListener('click', async () => {
-    const file = document.getElementById('videoInput').files[0];
-    if (!file) return alert("يرجى اختيار فيديو");
+// static/script.js
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
 
-    const formData = new FormData();
-    formData.append('video', file);
+  const response = await fetch('/analyze', {
+    method: 'POST',
+    body: formData
+  });
 
-    try {
-        const response = await fetch('/analyze', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
-        
-        document.getElementById('outputText').textContent = data.text;
-        document.getElementById('results').style.display = 'block';
-    } catch (error) {
-        alert("حدث خطأ أثناء التحليل");
-    }
+  const data = await response.json();
+  document.getElementById('result').value = data.text;
 });
+
+function speakText() {
+  const text = document.getElementById('result').value;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'ar-SA';
+  speechSynthesis.speak(utterance);
+}
